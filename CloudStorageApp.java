@@ -18,8 +18,8 @@ public class CloudStorageApp extends JFrame {
     private JButton uploadButton, downloadButton, newFolderButton, deleteButton, shareButton;
     private JLabel statusLabel, storageLabel;
     private JTree folderTree;
-    private boolean isLoggedIn = false;
-    private String currentUser = "";
+    private boolean isLoggedIn = true;
+    private String currentUser;
     
     // Sample data for demonstration
     private String[][] fileData = {
@@ -40,8 +40,7 @@ public class CloudStorageApp extends JFrame {
             public void run() {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    CloudStorageApp frame = new CloudStorageApp();
-                    // Don't set visible here, it will be set after login
+                    // Remove direct instantiation since we'll create it from LoginPage
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -52,16 +51,17 @@ public class CloudStorageApp extends JFrame {
     /**
      * Create the frame.
      */
-    public CloudStorageApp() {
-        setTitle("Cloud Storage System");
+    public CloudStorageApp(User user) {
+        this.currentUser = user.getUsername();
+        setTitle("Cloud Storage System - Welcome " + currentUser);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1000, 600);
         
         // Initialize all components
         initializeComponents();
         
-        // Show login dialog
-        showLoginDialog();
+        // Show the main window directly
+        setVisible(true);
     }
     
     private void initializeComponents() {
@@ -90,65 +90,6 @@ public class CloudStorageApp extends JFrame {
         
         // Create status bar
         createStatusBar();
-    }
-    
-    private void showLoginDialog() {
-        JDialog loginDialog = new JDialog(this, "Login", true);
-        loginDialog.setSize(300, 150);
-        loginDialog.setLocationRelativeTo(this);
-        loginDialog.setLayout(new BorderLayout());
-        
-        JPanel loginPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-        loginPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        
-        JLabel userLabel = new JLabel("Username:");
-        JTextField userField = new JTextField();
-        JLabel passLabel = new JLabel("Password:");
-        JPasswordField passField = new JPasswordField();
-        
-        JButton loginButton = new JButton("Login");
-        JButton cancelButton = new JButton("Cancel");
-        
-        loginPanel.add(userLabel);
-        loginPanel.add(userField);
-        loginPanel.add(passLabel);
-        loginPanel.add(passField);
-        loginPanel.add(loginButton);
-        loginPanel.add(cancelButton);
-        
-        loginDialog.add(loginPanel, BorderLayout.CENTER);
-        
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (userField.getText().equals("admin") && new String(passField.getPassword()).equals("password")) {
-                    isLoggedIn = true;
-                    currentUser = userField.getText();
-                    loginDialog.dispose();
-                    updateStatusBar();
-                    setVisible(true); // Show main window after successful login
-                } else {
-                    JOptionPane.showMessageDialog(loginDialog, 
-                        "Please enter valid credentials", 
-                        "Login Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-        
-        loginDialog.setVisible(true);
-        
-        // If user closed dialog without logging in
-        if (!isLoggedIn) {
-            System.exit(0);
-        }
     }
     
     private void createMenuBar() {
